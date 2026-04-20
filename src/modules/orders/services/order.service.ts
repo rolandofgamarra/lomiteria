@@ -2,6 +2,15 @@ import { OrderRepository } from "../repositories/order.repository.js";
 import { prisma } from "../../../database/index.js";
 import { socketManager } from "../../../core/socket/socket.manager.js";
 
+type OrderItemInput = {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  notes?: string;
+  extras?: number[];
+};
+
 /**
  * OrderService: Business logic for order transactions.
  * Handles pricing calculations, half-and-half surcharges, and extras.
@@ -29,7 +38,7 @@ export class OrderService {
     }[];
   }) {
     let orderTotal = 0;
-    const itemsToCreate = [];
+    const itemsToCreate: OrderItemInput[] = [];
 
     for (const item of data.items) {
       // 1. Fetch Product
@@ -62,14 +71,16 @@ export class OrderService {
       const itemSubtotal = (unitPrice + extrasTotal) * item.quantity;
       orderTotal += itemSubtotal;
 
-      itemsToCreate.push({
+      const orderItem = {
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: unitPrice + extrasTotal,
         subtotal: itemSubtotal,
-        notes: item.notes,
-        extras: item.extras,
-      });
+        ...(item.notes !== undefined ? { notes: item.notes } : {}),
+        ...(item.extras !== undefined ? { extras: item.extras } : {}),
+      };
+
+      itemsToCreate.push(orderItem);
     }
 
     const order = await this.orderRepository.createOrder({

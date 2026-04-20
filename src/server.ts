@@ -3,7 +3,7 @@ import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { socketManager } from "./core/socket/socket.manager.js";
 
-const PORT = env.PORT;
+const PORT = Number.parseInt(env.PORT, 10);
 const httpServer = createServer(app);
 
 // Initialize Real-time Layer

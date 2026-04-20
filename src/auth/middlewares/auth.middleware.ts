@@ -16,6 +16,9 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   }
 
   const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Missing or invalid token" });
+  }
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);

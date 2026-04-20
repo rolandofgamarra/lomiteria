@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, FlatList, ActivityIndicator } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "../api/catalogService";
 import { useCartStore } from "../store/useCartStore";
+import type { CatalogCategory, Product } from "../types/api";
 
 /**
  * MenuScreen: Fast category-based browsing of ZarfPizzas products.
@@ -13,17 +14,18 @@ export default function MenuScreen({ onBack }: { onBack: () => void }) {
   const addItem = useCartStore((state) => state.addItem);
   const selectedTableId = useCartStore((state) => state.selectedTableId);
 
-  const { data: catalog, isLoading } = useQuery({
+  const { data: catalog, isLoading } = useQuery<CatalogCategory[]>({
     queryKey: ["catalog"],
     queryFn: catalogService.getCatalog,
-    onSuccess: (data) => {
-        if (data.length > 0 && activeCategory === null) {
-            setActiveCategory(data[0].id);
-        }
-    }
   });
 
-  const renderCategoryTab = (category: any) => (
+  useEffect(() => {
+    if (catalog?.length && activeCategory === null) {
+      setActiveCategory(catalog[0].id);
+    }
+  }, [catalog, activeCategory]);
+
+  const renderCategoryTab = (category: CatalogCategory) => (
     <TouchableOpacity
       key={category.id}
       onPress={() => setActiveCategory(category.id)}
@@ -39,7 +41,7 @@ export default function MenuScreen({ onBack }: { onBack: () => void }) {
     </TouchableOpacity>
   );
 
-  const renderProduct = (product: any) => (
+  const renderProduct = (product: Product) => (
     <TouchableOpacity
       key={product.id}
       onPress={() => {
@@ -73,7 +75,7 @@ export default function MenuScreen({ onBack }: { onBack: () => void }) {
       );
   }
 
-  const currentCategoryData = catalog?.find((c: any) => c.id === activeCategory);
+  const currentCategoryData = catalog?.find((c) => c.id === activeCategory);
 
   return (
     <View className="flex-1 bg-secondary pt-12">

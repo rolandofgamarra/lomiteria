@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from "react-
 import { useQuery } from "@tanstack/react-query";
 import { tableService } from "../api/tableService";
 import { useAuthStore } from "../store/useAuthStore";
+import type { TableRecord } from "../types/api";
 
 /**
  * TableMapScreen: Visual grid of the dining area.
@@ -17,13 +18,13 @@ export default function TableMapScreen({ onSelectTable }: { onSelectTable: (id: 
     isLoading,
     refetch,
     isRefetching,
-  } = useQuery({
+  } = useQuery<TableRecord[]>({
     queryKey: ["tables"],
     queryFn: tableService.getTables,
     refetchInterval: 5000, // Refresh status every 5s for the demo
   });
 
-  const renderTable = (table: any) => {
+  const renderTable = (table: TableRecord) => {
     const isOccupied = table.status === "OCCUPIED";
 
     return (

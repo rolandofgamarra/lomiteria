@@ -33,15 +33,17 @@ export class OrderRepository {
 
       // 2. Create Order Items and their extra links
       for (const item of data.items) {
+        const orderItemData = {
+          orderId: order.id,
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          subtotal: item.subtotal,
+          ...(item.notes !== undefined ? { notes: item.notes } : {}),
+        };
+
         const orderItem = await tx.orderItem.create({
-          data: {
-            orderId: order.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            subtotal: item.subtotal,
-            notes: item.notes,
-          },
+          data: orderItemData,
         });
 
         // 3. Link Extras if provided

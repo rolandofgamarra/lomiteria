@@ -14,7 +14,7 @@ interface CartState {
   selectedTableId: number | null;
   items: CartItem[];
   
-  selectTable: (tableId: number) => void;
+  selectTable: (tableId: number | null) => void;
   addItem: (item: CartItem) => void;
   removeItem: (index: number) => void;
   clearCart: () => void;
