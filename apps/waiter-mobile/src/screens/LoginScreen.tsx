@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useAuthStore } from "../store/useAuthStore";
 import apiClient from "../api/apiClient";
 
@@ -34,53 +34,80 @@ export default function LoginScreen() {
   };
 
   return (
-    <View className="flex-1 bg-secondary justify-center px-8">
-      <View className="items-center mb-12">
-        <Text className="text-primary text-5xl font-bold italic">Zarf'Pizzas</Text>
-        <Text className="text-gray-400 text-lg mt-2">Sistema de Mozos</Text>
-      </View>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View className="flex-1 justify-center px-6">
+        <View className="mb-8 rounded-[32px] border border-primary/15 bg-surface px-6 py-8">
+          <Text className="text-primary text-[40px] font-black italic tracking-tight">Zar´fPizzas</Text>
+          <Text className="text-text text-xl font-semibold mt-2">Panel de mozos</Text>
+          <Text className="text-accent mt-3 leading-5">
+            Toma pedidos, revisa mesas y envía comandas sin perder contexto entre el salón y la cocina.
+          </Text>
 
-      <View className="space-y-6">
-        <View>
-          <Text className="text-white mb-2 ml-1 font-medium">Usuario</Text>
-          <TextInput
-            className="bg-white/10 text-white p-4 rounded-2xl border border-white/20"
-            placeholder="Ingrese su usuario..."
-            placeholderTextColor="#666"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
+          <View className="mt-5 flex-row flex-wrap gap-3">
+            <TouchableOpacity
+              onPress={() => {
+                setUsername("waiter1");
+                setPassword("zarf123");
+              }}
+              className="rounded-full border border-primary/15 bg-secondary px-4 py-3"
+            >
+              <Text className="text-text text-xs font-bold">Cargar mozo demo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setUsername("admin");
+                setPassword("zarf123");
+              }}
+              className="rounded-full border border-primary/15 bg-secondary px-4 py-3"
+            >
+              <Text className="text-text text-xs font-bold">Cargar admin demo</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View>
-          <Text className="text-white mb-2 ml-1 font-medium">Contraseña</Text>
-          <TextInput
-            className="bg-white/10 text-white p-4 rounded-2xl border border-white/20"
-            placeholder="********"
-            placeholderTextColor="#666"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+        <View className="rounded-[32px] border border-primary/15 bg-surface p-5">
+          <View className="mb-5">
+            <Text className="text-text mb-2 ml-1 font-medium">Usuario</Text>
+            <TextInput
+              className="bg-secondary text-text p-4 rounded-2xl border border-primary/15"
+              placeholder="Ingrese su usuario..."
+              placeholderTextColor="#9A7A70"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View>
+            <Text className="text-text mb-2 ml-1 font-medium">Contraseña</Text>
+            <TextInput
+              className="bg-secondary text-text p-4 rounded-2xl border border-primary/15"
+              placeholder="********"
+              placeholderTextColor="#9A7A70"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={loading}
+            className={`mt-6 rounded-2xl p-4 items-center justify-center ${loading ? "bg-primary/60" : "bg-primary"}`}
+          >
+            {loading ? <ActivityIndicator color="white" /> : <Text className="text-white font-bold text-lg">INGRESAR</Text>}
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={handleLogin}
-          disabled={loading}
-          className={`bg-primary p-5 rounded-2xl mt-4 items-center flex-row justify-center ${loading ? 'opacity-70' : ''}`}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white font-bold text-lg">INGRESAR</Text>
-          )}
-        </TouchableOpacity>
+        <View className="mt-8 flex-row justify-between">
+          <Text className="text-accent text-xs">v1.0.0</Text>
+          <Text className="text-accent text-xs">Ñemby, Paraguay</Text>
+        </View>
       </View>
-      
-      <Text className="text-gray-500 text-center mt-12 text-xs">
-        v1.0.0 - Ñemby, Paraguay
-      </Text>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

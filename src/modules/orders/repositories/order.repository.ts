@@ -123,4 +123,31 @@ export class OrderRepository {
       orderBy: { createdAt: "desc" },
     });
   }
+
+  /**
+   * Get recent orders for a specific table.
+   */
+  async findByTableId(tableId: number, limit = 8) {
+    return prisma.order.findMany({
+      where: { tableId },
+      include: {
+        table: true,
+        items: {
+          include: {
+            product: true,
+            extras: {
+              include: {
+                productExtra: true,
+              },
+            },
+          },
+        },
+        waiter: {
+          select: { id: true, username: true, role: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  }
 }

@@ -14,6 +14,14 @@ catalogRouter.get(
   catalogController.getCatalog
 );
 
+// GET /catalog/extras -> Fetch add-ons for product configuration
+catalogRouter.get(
+  "/extras",
+  requireAuth,
+  authorizeRoles("WAITER", "CASHIER", "ADMIN"),
+  catalogController.getExtras
+);
+
 // GET /catalog/categories/:categoryId/products -> Fetch filtered products
 catalogRouter.get(
   "/categories/:categoryId/products",

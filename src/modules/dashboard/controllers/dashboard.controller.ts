@@ -28,13 +28,15 @@ export class DashboardController {
    */
   getAnalytics = async (req: Request, res: Response) => {
     try {
-      const [weeklyRevenue, topProducts] = await Promise.all([
+      const [weeklyRevenue, monthlyRevenue, topProducts] = await Promise.all([
         this.dashboardService.getWeeklyRevenue(),
+        this.dashboardService.getMonthlyRevenue(),
         this.dashboardService.getTopProducts(),
       ]);
 
       res.json({
         weeklyRevenue,
+        monthlyRevenue,
         topProducts,
       });
     } catch (error: any) {

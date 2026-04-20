@@ -22,6 +22,14 @@ orderRouter.get(
   orderController.getById
 );
 
+// GET /orders/table/:tableId -> Recent orders for a table
+orderRouter.get(
+  "/table/:tableId",
+  requireAuth,
+  authorizeRoles("WAITER", "CASHIER", "ADMIN"),
+  orderController.getByTable
+);
+
 // POST /orders -> Create new order
 orderRouter.post(
   "/",

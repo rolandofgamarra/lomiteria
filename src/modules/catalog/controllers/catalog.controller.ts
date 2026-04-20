@@ -36,4 +36,16 @@ export class CatalogController {
       next(error);
     }
   };
+
+  /**
+   * Get all extras for product configuration.
+   */
+  getExtras = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const extras = await this.catalogService.getExtras();
+      return res.status(200).json(extras);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -106,6 +106,10 @@ export class OrderService {
     return this.orderRepository.findById(id);
   }
 
+  async getOrdersByTableId(tableId: number, limit = 8) {
+    return this.orderRepository.findByTableId(tableId, limit);
+  }
+
   async transitionStatus(id: number, status: string) {
     const updatedOrder = await this.orderRepository.updateStatus(id, status);
     

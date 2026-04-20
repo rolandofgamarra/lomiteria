@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface CartItem {
+export interface CartItem {
   productId: number;
   name: string;
   price: number;
@@ -17,8 +17,12 @@ interface CartState {
   selectTable: (tableId: number | null) => void;
   addItem: (item: CartItem) => void;
   removeItem: (index: number) => void;
+  updateItemQuantity: (index: number, delta: number) => void;
+  updateItemNotes: (index: number, notes: string) => void;
+  clearItems: () => void;
   clearCart: () => void;
   getTotal: () => number;
+  getItemCount: () => number;
 }
 
 /**
@@ -32,11 +36,59 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   selectTable: (tableId) => set({ selectedTableId: tableId }),
 
-  addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+  addItem: (item) =>
+    set((state) => {
+      const existingIndex = state.items.findIndex((current) => {
+        if (current.productId !== item.productId) return false;
+        if (Boolean(current.isHalfAndHalf) !== Boolean(item.isHalfAndHalf)) return false;
+        if ((current.notes ?? "").trim() !== (item.notes ?? "").trim()) return false;
+        if (current.extras.length !== item.extras.length) return false;
+
+        return current.extras.every((extra, index) => extra.id === item.extras[index]?.id);
+      });
+
+      if (existingIndex >= 0) {
+        const nextItems = [...state.items];
+        nextItems[existingIndex] = {
+          ...nextItems[existingIndex],
+          quantity: nextItems[existingIndex].quantity + item.quantity,
+        };
+        return { items: nextItems };
+      }
+
+      return { items: [...state.items, item] };
+    }),
 
   removeItem: (index) => set((state) => ({
     items: state.items.filter((_, i) => i !== index)
   })),
+
+  updateItemQuantity: (index, delta) =>
+    set((state) => {
+      const nextItems = [...state.items];
+      const currentItem = nextItems[index];
+
+      if (!currentItem) {
+        return state;
+      }
+
+      const nextQuantity = currentItem.quantity + delta;
+
+      if (nextQuantity <= 0) {
+        nextItems.splice(index, 1);
+      } else {
+        nextItems[index] = { ...currentItem, quantity: nextQuantity };
+      }
+
+      return { items: nextItems };
+    }),
+
+  updateItemNotes: (index, notes) =>
+    set((state) => ({
+      items: state.items.map((item, i) => (i === index ? { ...item, notes } : item)),
+    })),
+
+  clearItems: () => set({ items: [] }),
 
   clearCart: () => set({ items: [], selectedTableId: null }),
 
@@ -47,5 +99,9 @@ export const useCartStore = create<CartState>((set, get) => ({
       const mitadTotal = item.isHalfAndHalf ? 5000 : 0;
       return acc + (item.price + extrasTotal + mitadTotal) * item.quantity;
     }, 0);
+  },
+
+  getItemCount: () => {
+    return get().items.reduce((count, item) => count + item.quantity, 0);
   },
 }));

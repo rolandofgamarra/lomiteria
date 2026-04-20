@@ -30,6 +30,15 @@ export class CatalogRepository {
   }
 
   /**
+   * Get all extras available for order customization.
+   */
+  async findAllExtras() {
+    return prisma.productExtra.findMany({
+      orderBy: { name: "asc" },
+    });
+  }
+
+  /**
    * Find a specific product by ID.
    */
   async findProductById(id: number) {

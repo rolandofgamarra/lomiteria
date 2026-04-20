@@ -68,6 +68,20 @@ export class OrderController {
   };
 
   /**
+   * Get recent orders for a given table.
+   */
+  getByTable = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { tableId } = req.params;
+      const limit = req.query.limit ? Number(req.query.limit) : 8;
+      const orders = await this.orderService.getOrdersByTableId(Number(tableId), limit);
+      return res.status(200).json(orders);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Update the status of an order.
    */
   updateStatus = async (req: Request, res: Response, next: NextFunction) => {

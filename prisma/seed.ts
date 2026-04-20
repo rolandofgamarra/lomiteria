@@ -18,6 +18,11 @@ async function main() {
     update: {},
     create: { username: "waiter1", passwordHash, role: "WAITER" },
   });
+  await prisma.user.upsert({
+    where: { username: "cashier1" },
+    update: {},
+    create: { username: "cashier1", passwordHash, role: "CASHIER" },
+  });
 
   // --- 2. TABLES ---
   const tables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

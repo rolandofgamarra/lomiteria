@@ -23,4 +23,11 @@ export class CatalogService {
   async getProductsByCategory(categoryId: number) {
     return this.catalogRepository.findProductsByCategory(categoryId);
   }
+
+  /**
+   * Get the list of extras used in configurators.
+   */
+  async getExtras() {
+    return this.catalogRepository.findAllExtras();
+  }
 }

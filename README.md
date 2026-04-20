@@ -4,6 +4,7 @@ Monorepo for the Lomiteria system:
 
 - `src/` and `prisma/` contain the backend API.
 - `apps/waiter-mobile/` contains the Expo mobile app.
+- `apps/cashier-desktop/` contains the cashier desktop web app.
 - `CatalogoPrecios/` contains menu catalog images.
 
 ## Requirements
@@ -63,11 +64,39 @@ EXPO_PUBLIC_SOCKET_URL=http://localhost:3000
 
 If you are testing on a physical device, use a reachable LAN IP or `npm run start:tunnel`.
 
+## Cashier Desktop App
+
+From `apps/cashier-desktop/`:
+
+```bash
+npm install
+npm run dev
+```
+
+Set the API URL when the backend is not running on localhost:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+The cashier app is the only place where income analytics are shown. It includes:
+
+- weekly revenue
+- monthly revenue
+- active orders
+- payment processing
+
+Demo cashier credentials:
+
+- `cashier1`
+- `zarf123`
+
 ## Seed Data
 
 The seed script creates:
 
 - `admin` user with password `zarf123`
+- `cashier1` user with password `zarf123`
 - `waiter1` user with password `zarf123`
 - default tables, categories, products, and extras
 

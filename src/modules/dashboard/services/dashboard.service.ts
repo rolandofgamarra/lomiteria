@@ -1,5 +1,5 @@
 import { prisma } from "../../../database/index.js";
-import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
+import { startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, format } from "date-fns";
 
 /**
  * DashboardService: Aggregates business data for analytical views.
@@ -59,6 +59,33 @@ export class DashboardService {
     }
 
     return weeks.reverse();
+  }
+
+  /**
+   * Get monthly revenue flow for the last 6 months.
+   */
+  async getMonthlyRevenue() {
+    const months = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const date = subMonths(new Date(), i);
+      const start = startOfMonth(date);
+      const end = endOfMonth(date);
+
+      const sum = await prisma.sale.aggregate({
+        where: {
+          completedAt: { gte: start, lte: end },
+        },
+        _sum: { totalAmount: true },
+      });
+
+      months.push({
+        label: format(start, "MMM yyyy"),
+        amount: sum._sum.totalAmount || 0,
+      });
+    }
+
+    return months;
   }
 
   /**
