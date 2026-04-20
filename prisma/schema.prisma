@@ -1,0 +1,133 @@
+// Prisma schema for Lomitería Demo (SQLite Compatible)
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Models in singular, Tables in plural
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("WAITER") // Roles: ADMIN, CASHIER, WAITER
+  orders       Order[]
+
+  @@map("users")
+}
+
+model Table {
+  id       Int         @id @default(autoincrement())
+  number   Int         @unique
+  status   String      @default("AVAILABLE") // Status: AVAILABLE, OCCUPIED, RESERVED
+  capacity Int         @default(4)
+  orders   Order[]
+
+  @@map("tables")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  price       Int         // Changed to Int for Gs support
+  isAvailable Boolean     @default(true)
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+
+  @@unique([name, categoryId])
+  @@map("products")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  status      String      @default("PENDING") // Status: PENDING, PREPARING, DELIVERED, PAID, CANCELLED
+  totalAmount Int         @default(0)   // Changed to Int for Gs support
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  tableId     Int
+  table       Table       @relation(fields: [tableId], references: [id])
+  
+  waiterId    Int
+  waiter      User        @relation(fields: [waiterId], references: [id])
+  
+  items       OrderItem[]
+  payment     Payment?
+  sale        Sale?
+
+  @@map("orders")
+}
+
+
+model ProductExtra {
+  id         Int              @id @default(autoincrement())
+  name       String
+  price      Int              // Gs support
+  orderItems OrderItemExtra[]
+
+  @@map("product_extras")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  unitPrice Int     // Changed to Int for Gs support
+  subtotal  Int     // Changed to Int for Gs support
+  notes     String?
+
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  extras    OrderItemExtra[]
+
+  @@map("order_items")
+}
+
+model OrderItemExtra {
+  id             Int          @id @default(autoincrement())
+  orderItemId    Int
+  orderItem      OrderItem    @relation(fields: [orderItemId], references: [id])
+  productExtraId Int
+  productExtra   ProductExtra @relation(fields: [productExtraId], references: [id])
+
+  @@map("order_item_extras")
+}
+
+model Payment {
+  id          Int           @id @default(autoincrement())
+  method      String        @default("CASH") // Methods: CASH, DEBIT_CARD, CREDIT_CARD, TRANSFER
+  amount      Int           // Changed to Int for Gs support
+  processedAt DateTime      @default(now())
+
+  orderId     Int           @unique
+  order       Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model Sale {
+  id            Int      @id @default(autoincrement())
+  totalAmount   Int      // Changed to Int for Gs support
+  taxAmount     Int      @default(0) // Changed to Int for Gs support
+  completedAt   DateTime @default(now())
+
+  orderId       Int      @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+
+  @@map("sales")
+}
