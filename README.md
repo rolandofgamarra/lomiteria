@@ -23,10 +23,10 @@ From the repository root:
 
 ```bash
 npm install
-npx prisma generate
-npx prisma migrate dev
-npx tsx prisma/seed.ts
-npx tsx src/server.ts
+npm run prisma:generate
+npm run db:migrate
+npm run db:seed
+npm run dev
 ```
 
 The API listens on `PORT` and defaults to `3000`.
@@ -73,7 +73,17 @@ The seed script creates:
 
 Run the seed again after resetting the database if you want the demo data restored.
 
+## Useful Scripts
+
+Backend scripts in the root `package.json`:
+
+- `npm run dev` runs the API with file watching.
+- `npm start` runs the API once without watching.
+- `npm run prisma:generate` regenerates Prisma Client.
+- `npm run db:migrate` applies migrations in development.
+- `npm run db:deploy` applies migrations in production.
+- `npm run db:seed` loads the demo data.
+
 ## Deployment Notes
 
 See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for production and hosting notes.
-
